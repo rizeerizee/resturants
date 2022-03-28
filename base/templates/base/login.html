@@ -1,0 +1,37 @@
+{% extends 'base/main.html' %}
+{% load static %}
+
+  {% block content %}
+  <!-- End Nav Section -->
+  
+  <!-- Contact Form Section -->
+  <section id="form" data-aos="fade-down">
+    <div class="container">
+      <h3 class="form__title">
+        Login
+      </h3>
+      <div class="form__wrapper">
+        <form name="contact" method="POST" netlify>
+            {% csrf_token %}
+          <div class="form__group">
+            <label for="firstName">Email</label>
+            <input type="text" id="name" name="email" placeholder="Email" required>
+          </div>
+          <div class="form__group">
+            <label for="lastName">Password</label>
+            <input type="password" id="password" name="password" placeholder="Password" required>
+          </div>
+          <button type="submit" class="btn primary-btn">Login</button>
+          
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <div style="text-align: center;">
+    <p>Haven't account ?</p>
+    <p><a href="{% url 'register' %}">Sign in</a></p>
+  </div>
+  <!-- End Contact Form Section-->
+  <!-- Footer -->
+  {% endblock %}

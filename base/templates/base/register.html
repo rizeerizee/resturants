@@ -1,0 +1,35 @@
+{% extends 'base/main.html' %}
+{% load static %}
+
+  {% block content %}
+  <!-- End Nav Section -->
+  
+  <!-- Contact Form Section -->
+  <section id="form" data-aos="fade-down">
+    <div class="container">
+      <h3 class="form__title">
+        Register
+      </h3>
+      <div class="form__wrapper">
+        <form name="contact" method="POST" netlify>
+            {% csrf_token %}
+            {% for form in forms %}
+          <div class="form__group">
+            <label for="firstName">{{form.label}}</label>
+            {{form}}
+          </div>
+            {% endfor %}
+          <button type="submit" class="btn primary-btn">Register</button>
+          
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <div style="text-align: center;">
+    <p>Already have account ?</p>
+    <p><a href="{% url 'login' %}">Login</a></p>
+  </div>
+  <!-- End Contact Form Section-->
+  <!-- Footer -->
+  {% endblock %}

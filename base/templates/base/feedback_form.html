@@ -1,0 +1,36 @@
+{% extends 'base/main.html' %}
+{% load static %}
+
+  {% block content %}
+  <!-- End Nav Section -->
+  
+  <!-- Contact Form Section -->
+  <section id="form" data-aos="fade-down">
+    <div class="container">
+      <h3 class="form__title">
+        Feedback
+      </h3>
+      <div class="form__wrapper">
+        <form id="feedback" name="contact" method="POST" netlify>
+            {% csrf_token %}
+            <div class="form__group form__group__full">
+              <label for="message">Message</label>
+              <textarea name="message" id="message" cols="30" rows="10" required></textarea>
+            </div>
+            <button type="submit" class="btn primary-btn">Send</button>
+          
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- End Contact Form Section-->
+  <script>
+    var feedback = document.getElementById('feedback')
+    feedback.addEventListener('submit', function(){
+      alert('Thank for your feedback')
+    })
+  </script>
+
+  <!-- Footer -->
+  {% endblock %}

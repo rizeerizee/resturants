@@ -1,0 +1,202 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+  <link rel="stylesheet" type="text/css" href="{% static 'css/cart.css' %}">
+
+  <script>
+    var user = '{{request.user}}'
+
+    function getToken(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+    }
+    var csrftoken = getToken('csrftoken');
+	
+	// Get cookie from our cookies in broswer
+    function getCookie(name) {
+		    // Split cookie string and get all individual name=value pairs in an array
+		var cookieArr = document.cookie.split(";");
+
+		    // Loop through the array elements
+		for(var i = 0; i < cookieArr.length; i++) {
+		    var cookiePair = cookieArr[i].split("=");
+
+		        /* Removing whitespace at the beginning of the cookie name
+		        and compare it with the given string */
+		    if(name == cookiePair[0].trim()) {
+		            // Decode the cookie value and return
+		        return decodeURIComponent(cookiePair[1]);
+		    }
+		}
+
+		    // Return null if not found
+		return null;
+	}
+    var cart = JSON.parse(getCookie('cart'))
+
+    if (cart == undefined || cart == null){
+      cart = {}
+      console.log('cart created!', cart)
+      document.cookie = 'cart=' + JSON.stringify(cart) + ';domain=;path=/'
+      console.log('cart: ', cart)
+    }
+  </script>
+</head>
+<body>
+     <div class="row">
+		<div class="col-lg-6">
+			<div class="box-element" id="form-wrapper">
+				<form id="form">
+					<div id="user-info">
+						<div class="form-field">
+							<input required class="form-control" type="text" name="name" placeholder="Name..">
+						</div>
+						<div class="form-field">
+							<input required class="form-control" type="email" name="email" placeholder="Email..">
+						</div>
+					</div>
+					
+					<div id="shipping-info">
+						<hr>
+						<p>Shipping Information:</p>
+						<hr>
+						<div class="form-field">
+							<input required class="form-control" type="text" name="address" placeholder="Address..">
+						</div>
+						<div class="form-field">
+							<input required class="form-control" type="text" name="phone" placeholder="Phone No..">
+						</div>
+						
+					</div>
+
+					<hr>
+					<input id="form-button" class="btn btn-success btn-block" type="submit" value="Continue">
+				</form>
+			</div>
+			<br>
+
+			<div class="box-element hidden" id="payment-info">
+				<small>Payment Option</small>
+				<button id="make-payment">Make Payment</button>
+			</div>
+			
+		</div>
+
+		<div class="col-lg-6">
+			<div class="box-element">
+				<a  class="btn btn-outline-dark" href="{% url 'cart' %}">&#x2190; Back to Cart</a>
+				<hr>
+				<h3>Order Summary</h3>
+				<hr>
+				{% for item in order_food %}
+				<div class="cart-row">
+					<div style="flex:2"><img class="row-image" src="{{item.food.imageUrl}}"></div>
+					<div style="flex:2"><p>{{item.food.name}}</p></div>
+					<div style="flex:1"><p>$ {{item.food.price}}</p></div>
+					<div style="flex:1"><p>x {{item.quantity}}</p></div>
+					<div style="flex:1"><p>$ {{item.get_total}}</p></div>
+				</div>
+				{% endfor %}
+				<h5>Items:   {{order.cart_food}}</h5>
+				<h5>Total:   ${{order.cart_total}}</h5>
+
+			</div>
+		</div>
+	</div>
+
+<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+
+<script>
+	var total = '{{order.cart_total}}'
+
+	if (user != 'AnonymousUser'){
+		document.getElementById("user-info").innerHTML = ''
+	}
+
+	var form = document.getElementById('form')
+	form.addEventListener('submit', function(e){
+		e.preventDefault()
+		console.log('Form submited...')
+		document.getElementById('form-button').classList.add('hidden')
+		document.getElementById('payment-info').classList.remove('hidden')
+	})
+
+	document.getElementById('make-payment').addEventListener("click", function(e){
+		submitFormData()
+	})
+
+	function submitFormData(){
+
+		console.log('Payment Completed...')
+
+		var userFormData = {
+			'name': null,
+			'email': null,
+			'total': total, 
+		}
+
+		var addressData = {
+			'address': null,
+			'phone': null,
+		}
+
+		if (user == "AnonymousUser"){
+			userFormData.name = form.name.value
+			userFormData.email = form.email.value
+		}
+
+		addressData['address'] = form.address.value
+		addressData['phone'] = form.phone.value
+
+		var url = '/submit_order/'
+
+		fetch(url, {
+			method: "POST",
+			headers: {
+			'Content-Type': 'application/json',
+			'X-CSRFToken': csrftoken,
+			},
+			body: JSON.stringify({'form': userFormData, 'addressData': addressData})
+
+		})
+		.then((response) => {
+			return response.json()
+		})
+		.then((data) => {
+			console.log('data: ', data)
+			alert('Transaction complete. We will send email to you if your order finish!')
+			cart = {}
+			document.cookie = 'cart=' + JSON.stringify(cart) + ';domain=;path=/'
+			window.location.href = "{% url 'home' %}"
+		})
+			
+	}
+
+
+</script>
+
+</body>
+</html>
